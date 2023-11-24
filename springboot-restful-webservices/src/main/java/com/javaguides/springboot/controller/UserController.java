@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.javaguides.springboot.dto.UserDto;
 import com.javaguides.springboot.entity.User;
 import com.javaguides.springboot.service.UserService;
 
@@ -26,29 +27,29 @@ public class UserController {
 	private UserService userService;
 	
 	@PostMapping
-	public ResponseEntity<User> createUser(@RequestBody User user){
-		User savedUser = userService.createUser(user);
+	public ResponseEntity<UserDto> createUser(@RequestBody UserDto user){
+		UserDto savedUser = userService.createUser(user);
 		return new ResponseEntity<>(savedUser,HttpStatus.CREATED);
 	}
 
 	@GetMapping("/get-user/{id}")
-	public ResponseEntity<User> getUserById(@PathVariable("id") Long userId){
-		User user = userService.getUserByID(userId);
+	public ResponseEntity<UserDto> getUserById(@PathVariable("id") Long userId){
+		UserDto user = userService.getUserByID(userId);
 		return new ResponseEntity<>(user,HttpStatus.OK);
 		
 	}
 	
 	@GetMapping("/getUsers")
-	public ResponseEntity<List<User>> getAllUsers(){
-		List<User> allUsers = userService.getAllUsers();
+	public ResponseEntity<List<UserDto>> getAllUsers(){
+		List<UserDto> allUsers = userService.getAllUsers();
 		return new ResponseEntity<>(allUsers, HttpStatus.OK);
 	}
 	
 	@PutMapping("/update-user/{id}")
-	public ResponseEntity<User> updateUser(@RequestBody User user,
+	public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user,
 										   @PathVariable("id") Long userId){
 		user.setId(userId);
-		User updatedUser = userService.updateUser(user);
+		UserDto updatedUser = userService.updateUser(user);
 		return new ResponseEntity<>(updatedUser,HttpStatus.OK);
 	}
 	
