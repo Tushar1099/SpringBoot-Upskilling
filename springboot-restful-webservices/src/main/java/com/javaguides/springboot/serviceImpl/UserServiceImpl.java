@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.javaguides.springboot.dto.UserDto;
 import com.javaguides.springboot.entity.User;
+import com.javaguides.springboot.exception.EmailAlreadyExistsException;
+import com.javaguides.springboot.exception.ResourceNotFoundException;
 import com.javaguides.springboot.mapper.AutoUserMapper;
 import com.javaguides.springboot.mapper.UserMapper;
 import com.javaguides.springboot.repo.UserRepo;
@@ -29,6 +31,12 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public UserDto createUser(UserDto userDto) {
 		
+		Optional<User> optionalUser = userRepo.findByEmail(userDto.getEmail());
+		
+		if(optionalUser.isPresent()) {
+			throw new EmailAlreadyExistsException("Email already exists for this user");
+		}
+		
 //		Convert UserDto into user JPA Entity
 //		User user = UserMapper.mapToUser(userDto);
 		User user = modelMapper.map(userDto, User.class);
@@ -46,8 +54,10 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public UserDto getUserByID(Long userId) {
-		Optional<User> optionalUser = userRepo.findById(userId);
-		User user = optionalUser.get();
+		User user = userRepo.findById(userId).orElseThrow(
+				() -> new ResourceNotFoundException("name", "id", userId)
+		);
+//		User user = optionalUser.get();
 //		return UserMapper.mapToUserDto(user);
 		return modelMapper.map(user, UserDto.class);
 //		return AutoUserMapper.MAPPER.mapToUserDto(user);
@@ -86,7 +96,9 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public UserDto updateUser(UserDto user) {
-		User existingUser = userRepo.findById(user.getId()).get();
+		User existingUser = userRepo.findById(user.getId()).orElseThrow(
+				() -> new ResourceNotFoundException("user", "id", user.getId())
+		);
 		existingUser.setFirstName(user.getFirstName());
 		existingUser.setLastName(user.getLastName());
 		existingUser.setEmail(user.getEmail());
@@ -98,6 +110,10 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public void deleteUser(Long userId) {
+		
+		User existingUser = userRepo.findById(userId).orElseThrow(
+				() -> new ResourceNotFoundException("user", "id", userId)
+		);
 		 userRepo.deleteById(userId);
 	}
 
